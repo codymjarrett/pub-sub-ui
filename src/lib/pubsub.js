@@ -11,4 +11,14 @@ class PubSub {
 
         this.events.get(event).push(callback);
     }
+
+    publish(event, data) {
+        if (!this.events.has(event)) {
+            return [];
+        }
+
+        return this.events.get(event).map(callback => callback(data));
+    }
 }
+
+export default PubSub;
