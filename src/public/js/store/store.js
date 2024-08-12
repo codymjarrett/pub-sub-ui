@@ -1,4 +1,4 @@
-import PubSub from "../lib/pubsub.js";
+import PubSub from "../../lib/pubsub.js";
 
 class Store {
     constructor(params) {
@@ -15,7 +15,8 @@ class Store {
             this.mutations = params['mutations'];
         }
         this.state = new Proxy(params.state || {}, {
-            set: function(state, value, key) {
+            // remember arrow functions this is lexically resolved. this wouldn't work with a regular
+            set: (state, key, value)  => {
                 state[key] = value;
                 console.log(`stateChange: ${key}: ${value}`);
                 this.events.publish('stateChange', this.state);
@@ -24,7 +25,6 @@ class Store {
         })
     }
     dispatch(actionName, payload){
-        // should i use const self  = this; here?
         if(typeof this.actions[actionName] !== 'function'){
             console.error(`Action ${actionName} doesn't exist`);
             return false;
@@ -36,6 +36,7 @@ class Store {
 
     }
     commit(mutationName, payload){
+
         if(typeof this.mutations[mutationName] !== 'function'){
             console.error(`Mutation ${mutationName} doesn't exist`);
             return false;
